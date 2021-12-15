@@ -6,7 +6,7 @@ Author : Richard Easton
 
 Description: Searches ALL locations for .jar files
 
-Usage: Run powershell or Powershell_ise as an account that has rights to read from the server.
+Usage: Run powershell or Powershell_ise as an account that has rights to read on the server.
 
 output: will output results to a log file in logs folder
 
