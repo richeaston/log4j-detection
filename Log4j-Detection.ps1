@@ -19,7 +19,7 @@ if ((test-path $log) -eq $false) {
     Add-LogEntry -Value "Log file created"
 }
 
-$servers = get-content -Path "$dir\gag-citrix-Servers-1.csv"
+$servers = get-content -Path "$dir\Servers.csv"
 $datetime = get-date -format "dd-MM-yyyy HH:mm:ss"
 Add-LogEntry -Value "Server list ingested"
 Add-LogEntry -value ""
