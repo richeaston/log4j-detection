@@ -35,18 +35,19 @@ foreach ($server in $servers) {
         try {
         Write-host "`t$($S[0]) is online"   
         Add-LogEntry -Value "$($S[0]) is online"
-        $drives = Invoke-Command -ComputerName $server -ScriptBlock { get-psdrive | where {$_.provider -like '*filesystem*'} | select -expandproperty root } -verbose
-        foreach ($drive in $drives) {
-            $results = Invoke-Command -ComputerName $server  -ScriptBlock { Get-ChildItem -path '$drive' -Recurse -force -include *.jar -ErrorAction ignore | foreach {select-string "JndiLookup.class" $_} | select FileName, Path, Pattern } -verbose
+        #$drives = Invoke-Command -ComputerName $server  -ScriptBlock { get-psdrive | where {$_.provider -like '*filesystem*'} | select -expandproperty root } -verbose
+        #$drives
+        #foreach ($drive in $drives) {
+            $results = Invoke-Command -ComputerName $server  -ScriptBlock { Get-ChildItem -path "c:\" -Recurse -force -include *.jar -ErrorAction ignore | foreach {select-string "JndiLookup.class" $_} | select FileName, Path, Pattern } -verbose
             foreach ($result in $results) {
-                Write-output "`tadding $($result.fullname) found on $($S[0])"
+                Write-output "adding $($result.filename) found on $($S[0])"
                 Add-LogEntry -value ""
-                add-logentry -value "$($result.fullname) found on $($S[0])"
-                Add-Logentry -value "$($result.Path)"
-                Add-Logentry -value "$($result.Pattern)"
+                add-logentry -value $result.filename" found on $($S[0])"
+                Add-Logentry -value $result.Path
+                Add-Logentry -value $result.Pattern
                 Add-LogEntry -value ""
             }
-        }
+        #}
         }
         Catch {
             Write-host "an error occurred!"
