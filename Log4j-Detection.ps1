@@ -23,7 +23,6 @@ $servers = get-content -Path "$dir\gag-citrix-Servers-1.csv"
 $datetime = get-date -format "dd-MM-yyyy HH:mm:ss"
 Add-LogEntry -Value "Server list ingested"
 $log4jfile = "$dir\log4j-detection.ps1"
-#$creds = Get-Credential -Message "Enter Username and password for domain" 
 
 foreach ($server in $servers) {
     $s = $server.split(".")
@@ -33,12 +32,10 @@ foreach ($server in $servers) {
     #test connection to server
     if (Test-Connection -ComputerName $server -BufferSize 1 -Count 1) {
         try {
-        Write-host "`t$($S[0]) is online"   
-        Add-LogEntry -Value "$($S[0]) is online"
-        #$drives = Invoke-Command -ComputerName $server  -ScriptBlock { get-psdrive | where {$_.provider -like '*filesystem*'} | select -expandproperty root } -verbose
-        #$drives
-        #foreach ($drive in $drives) {
-            $results = Invoke-Command -ComputerName $server  -ScriptBlock { Get-ChildItem -path "c:\" -Recurse -force -include *.jar -ErrorAction ignore | foreach {select-string "JndiLookup.class" $_} | select FileName, Path, Pattern } -verbose
+            Write-host "`t$($S[0]) is online"   
+            Add-LogEntry -Value "$($S[0]) is online"
+        
+            $results = Invoke-Command -ComputerName $server -ScriptBlock { gwmi win32_logicaldisk -filter "DriveType = 3" | select-object DeviceID | Foreach-object { Get-ChildItem ($_.DeviceID + "\") -Recurse -force -include *.jar -ErrorAction ignore | foreach {select-string "JndiLookup.class" $_} | select FileName, Path, Pattern -verbose }}
             foreach ($result in $results) {
                 Write-output "adding $($result.filename) found on $($S[0])"
                 Add-LogEntry -value ""
@@ -47,13 +44,12 @@ foreach ($server in $servers) {
                 Add-Logentry -value $result.Pattern
                 Add-LogEntry -value ""
             }
-        #}
-        }
-        Catch {
+       }
+       Catch {
             Write-host "an error occurred!"
             Add-Logentry -value "An error occured on $($S[0])"
             Add-LogEntry -value ""
-        }
+       }
     Add-LogEntry "`t$($S[0]) search completed"
     Add-LogEntry -value ""
            
