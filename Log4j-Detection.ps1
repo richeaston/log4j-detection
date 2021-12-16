@@ -20,7 +20,6 @@ if ((test-path $log) -eq $false) {
 }
 
 $servers = get-content -Path "$dir\Servers.csv"
-$datetime = get-date -format "dd-MM-yyyy HH:mm:ss"
 Add-LogEntry -Value "Server list ingested"
 Add-LogEntry -value ""
 
