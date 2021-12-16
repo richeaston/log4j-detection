@@ -36,9 +36,16 @@ foreach ($server in $servers) {
             $results = Invoke-Command -ComputerName $($S[0]) -ScriptBlock { gwmi win32_logicaldisk -filter "DriveType = 3" | select-object DeviceID | Foreach-object { Get-ChildItem ($_.DeviceID + "\") -Recurse -force -include *.jar -ErrorAction ignore | foreach {select-string "JndiLookup.class" $_} | select FileName, Path, Pattern -verbose }}
             
             foreach ($result in $results) {
-                Write-host "`t`t└ $($result.filename) found on $($S[0])" -foregroundcolor Magenta
-                Write-host "`t`t└ $($result.Path)"-ForegroundColor Gray
-                add-logentry -value "$($result.filename) found on $($S[0]) with $($result.Pattern) on path $($result.Path)"
+                if ($($result.filename) -eq 'log4j-core-2.16.jar') {
+                    Write-host "`t`t└ $($result.filename) found on $($S[0]), but is version 2.16" -foregroundcolor Cyan
+                    Write-host "`t`t└ $($result.Path)"-ForegroundColor Gray
+                   add-logentry -value "Information, $($result.filename) found on $($S[0]) with $($result.Pattern) on path $($result.Path) but is ver 2.16"
+                } else  {
+                    Write-host "`t`t└ $($result.filename) found on $($S[0])" -foregroundcolor Magenta
+                    Write-host "`t`t└ $($result.Path)"-ForegroundColor Gray
+                    add-logentry -value "Warning!, $($result.filename) found on $($S[0]) with $($result.Pattern) on path $($result.Path)"
+                }
+                
             }
        }
        Catch {
@@ -51,3 +58,5 @@ foreach ($server in $servers) {
            
     }
 }
+
+                
